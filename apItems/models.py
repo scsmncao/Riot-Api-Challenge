@@ -6,6 +6,7 @@ import time
 import copy
 import requests
 import os.path
+import operator
 
 requests.packages.urllib3.disable_warnings()
 
@@ -18,25 +19,25 @@ gameModes = ['NORMAL_5X5', 'RANKED_SOLO']
 riotApi = RiotWatcher(devApiKey)
 
 # Create your models here.
-class Item(models.Model):
-	item_name = models.CharField(max_length=200)
-	buy_rate = models.FloatField(default=0)
-	win_rate = models.FloatField(default=0)
-	patch = models.CharField(max_length=200)
-	def __str__(self):
-		itemString = ''
-		itemString += 'Patch: ' + self.patch + '\n'
-		itemString += 'Item Name: ' + self.item_name + '\n'
-		itemString += 'Buy Rate: ' + self.buy_rate + '\n'
-		itemString += 'Win Rate: ' + self.win_rate + '\n'
-		return itemString
+# Wanted to use a database but due to time constraints had to use json objects and static data
 
-def fetch():
+# class Item(models.Model):
+# 	item_name = models.CharField(max_length=200)
+# 	buy_rate = models.FloatField(default=0)
+# 	win_rate = models.FloatField(default=0)
+# 	patch = models.CharField(max_length=200)
+# 	def __str__(self):
+# 		itemString = ''
+# 		itemString += 'Patch: ' + self.patch + '\n'
+# 		itemString += 'Item Name: ' + self.item_name + '\n'
+# 		itemString += 'Buy Rate: ' + self.buy_rate + '\n'
+# 		itemString += 'Win Rate: ' + self.win_rate + '\n'
+# 		return itemString
+
+# this will take a few days so start it early
+def fetchDatafromApi():
 	listOfGamesAndCount = getListOfGamesAndCount()
 	numberOfGamesCountByRegion = listOfGamesAndCount[0]
-	with open('static/apItems/data/games_count.json', 'w+') as f:
-		json.dump(numberOfGamesCountByRegion, f)
-		f.close()
 	listOfGames = listOfGamesAndCount[1]
 	dictionaryOfApItems = gatherAllApItems()
 
@@ -45,7 +46,7 @@ def fetch():
 	for patch in patchesToCompare:
 		for mode in gameModes:
 			for server in servers:
-				filePath = 'static/apItems/data/' + patch + '/' + mode + '/' + server + '.json'
+				filePath = 'apItems/static/apItems/data/' + patch + '/' + mode + '/' + server + '.json'
 				if os.path.isfile(filePath):
 					continue
 				gameIds = listOfGames[patch][mode][server]
@@ -120,4 +121,103 @@ def convertJsonToObject(file_path):
 		data = json.load(json_data)
 		json_data.close()
 		return data
-fetch()
+
+# these will be combined into one method, don't need to do a triple for loop everytime!!!!!!
+
+# we need to add the data from items that build from other items. Right now the data only exists for when the player
+# ends the game with that particular item
+def normalizeDataByAddingItemTree(patch, mode, server):
+	filePath = 'apItems/static/apItems/data/' + patch + '/' + mode + '/' + server + '.json'
+	finalPath = 'apItems/static/apItems/modified_data/' + patch + '/' + mode + '/' + server + '.json'
+	if os.path.isfile(finalPath):
+		return
+	dataFile = convertJsonToObject(filePath)
+	# first loop through the items with depth 3 since we want to add the rates consecutively from highest depth
+	# to lowest (4 is the highest so we don't need to add to that), this isn't efficient since it runs 
+	# through the data 4 times when it can be done in 1, but 
+	# there's not enough time to store new data so this will have to do for now
+	for i in range(3, 0, -1):
+		print 'working on depth %i for server %s in mode %s in patch %s' % (i, server, mode, patch)
+		for item in dataFile.keys():
+			apItem = riotApi.static_get_item(item, item_data='all')
+			if 'depth' not in apItem:
+				apItem['depth'] = 1
+			if apItem['depth'] == i and 'into' in apItem:
+				for itemId in apItem['into']:
+					if itemId in dataFile:
+						print 'before use count %i for item %s' % (dataFile[item]['useCount'], item) 
+						dataFile[item]['useCount'] += dataFile[itemId]['useCount']
+						print 'after use count %i' % dataFile[item]['useCount']
+						dataFile[item]['wins'] += dataFile[itemId]['wins']
+						for champion in dataFile[itemId]['championsUsed'].keys():
+							dataFile[item]['championsUsed'][champion] += dataFile[itemId]['championsUsed'][champion]
+	with open(finalPath, 'w+') as f:
+		json.dump(dataFile, f)
+		f.close()
+
+def createFinalDataSet(patch, mode, server):
+	filePath = 'apItems/static/apItems/modified_data/' + patch + '/' + mode + '/' + server + '.json'
+	finalPath = 'apItems/static/apItems/final_data/' + patch + '/' + mode + '/' + server + '.json'
+	if os.path.isfile(finalPath):
+		return
+	dataFile = convertJsonToObject(filePath)
+	finalData = {}
+	for item in dataFile.keys():
+		topChampionsUsed = sorted(dataFile[item]['championsUsed'].items(), key=operator.itemgetter(1))
+		finalTopChampionList = []
+		for i in range(len(topChampionsUsed) - 1, len(topChampionsUsed) - 11, -1):
+			if topChampionsUsed[i][1] != 0:
+				finalTopChampionList.append(topChampionsUsed[i][0])
+			else:
+				break
+		if dataFile[item]['useCount'] != 0:
+			win_rate = dataFile[item]['wins']/float(dataFile[item]['useCount'])
+		else:
+			win_rate = 0
+		finalData[item] = {
+			# the 100000 is from 10000 games with 10 people in them so 10000 * 10
+			'buy_rate': dataFile[item]['useCount']/100000.0,
+			'win_rate': win_rate,
+			'champions': finalTopChampionList,
+			'name': riotApi.static_get_item(item)['name']
+		}
+	with open(finalPath, 'w+') as f:
+		json.dump(finalData, f)
+		f.close()
+
+def createCombinedDataSet():
+	for patch in patchesToCompare:
+		finalCombinedData = {}
+		finalPath = 'apItems/static/apItems/final_data/' + patch + '/' + 'combined_data.json'
+		for mode in gameModes:
+			for server in servers:
+				filePath = 'apItems/static/apItems/final_data/' + patch + '/' + mode + '/' + server + '.json'
+				dataFile = convertJsonToObject(filePath)
+				for item in dataFile.keys():
+					if item not in finalCombinedData and dataFile[item]['buy_rate'] != 0:
+						finalCombinedData[item] = {
+							'buy_rate': 0,
+							'win_rate': 0,
+							'name': dataFile[item]['name']
+						}
+					if dataFile[item]['buy_rate'] != 0:
+						finalCombinedData[item]['buy_rate'] += dataFile[item]['buy_rate']
+						finalCombinedData[item]['win_rate'] += dataFile[item]['win_rate']
+		for item in finalCombinedData.keys():
+			if dataFile[item]['buy_rate'] != 0:
+				finalCombinedData[item]['buy_rate'] = round(finalCombinedData[item]['buy_rate']/(len(servers) * len(gameModes) * 1.0), 4)
+				finalCombinedData[item]['win_rate'] = round(finalCombinedData[item]['win_rate']/(len(servers) * len(gameModes) * 1.0), 4)
+		with open(finalPath, 'w+') as f:
+			json.dump(finalCombinedData, f)
+			f.close()
+
+def createFinalizedDataSet():
+	for patch in patchesToCompare:
+		for mode in gameModes:
+			for server in servers:
+				normalizeDataByAddingItemTree(patch, mode, server)
+				createFinalDataSet(patch, mode, server)
+
+fetchDatafromApi()
+createFinalizedDataSet()
+createCombinedDataSet()
