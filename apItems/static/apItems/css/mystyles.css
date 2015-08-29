@@ -1,5 +1,5 @@
 body { 
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(../images/background.jpg) no-repeat center center fixed; 
+  background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(../images/background.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -9,6 +9,10 @@ body {
 a {
     color: white;
     display: block;
+}
+
+body {
+    font-family: Helvetica,Arial,sans-serif;
 }
 
 .nav-bar {
@@ -24,6 +28,11 @@ a {
     margin-top: 16px;
     margin-left: 35px;
     font-size: 13pt;
+}
+
+.nav-home:hover {
+    color: white;
+    text-decoration: none;
 }
 
 .tags {
@@ -58,8 +67,12 @@ a {
     padding-top: 10px;
     clear: both;
     padding-bottom: 10px;
-    border-bottom: 1px solid #FFFFFF;
     width: 890px;
+    font-size: 11.5pt;
+}
+
+div.item-description:nth-child(even) {
+    background-color: rgba(20, 20, 20, .7) !important;
 }
 
 .item-description:last-child {
@@ -67,7 +80,7 @@ a {
 }
 
 div.item-description:hover {
-    background-color: #B28F00 !important;
+    background-color: #6B6B6B !important;
 }
 
 .item-img {
@@ -80,14 +93,14 @@ div.item-description:hover {
 }
 
 .label-for-chart {
-    text-decoration: underline;
+    font-weight: bold;
     font-size: 14pt;
     color: white;
 }
 
 .rate {
     color: white;
-    margin: 5px 5px 5px 0px;
+    margin: 5px 0px 5px 0px;
 }
 
 .rate-container {
@@ -111,10 +124,6 @@ div.item-description:hover {
     margin-right: 0px;
 }
 
-.buy-rate-second, .win-rate-second {
-    margin-left: 5px;
-}
-
 .buy {
     margin-left: 50px;
 }
@@ -130,6 +139,91 @@ div.item-description:hover {
     text-align: center;
     color: white;
     font-size: 16pt;
+}
+
+.full-item-description {
+    width: 900px;
+    margin: 100px auto 0px auto;
+}
+
+.item-main-name {
+    text-align: center;
+    font-size: 18pt;
+    color: #FFFFFF;
+    padding: 0px 0px 20px 0px;
+}
+
+.item-image-big {
+    width: 120px;
+    margin: 0 auto;
+}
+
+.item-results {
+    width: 475px;
+    margin: 20px auto;
+}
+
+.info-block {
+    color: white;
+    font-size: 16pt;
+    display: inline-block;
+}
+
+.buy-rate {
+    float:left;
+}
+
+.patch-number {
+    font-size: 10pt;
+    color: #969696;
+}
+
+.arrow-item-page {
+    float: left;
+    padding: 15px 10px 0px 10px;
+}
+
+.item-difference-specific {
+    text-align: center;
+}
+
+.main-info {
+    background-color: rgba(0,0,0,.7);
+    border-radius: 5px;
+    padding: 15px 15px 15px 15px;
+}
+
+.item-specific-page {
+    font-size: 18pt;
+    color: white;
+}
+
+.arrow {
+    margin: 0px 5px 0px 5px;
+}
+
+.champion-list-title {
+    width: 800px;
+    color: #FFFFFF;
+    font-size: 16pt;
+    margin: 0 auto;
+}
+
+.champion-list {
+    display:inline-block;
+    width: 370px;
+    background-color: rgba(0,0,0,.7);
+    border-radius: 5px;
+    padding: 10px 10px 10px 10px;
+}
+
+.champion-list-secondpatch {
+    margin-left: 50px;
+}
+
+.champion-individual-list {
+    width: 800px;
+    margin: 0 auto;
 }
 
 @media screen and (max-width: 1025px) {

@@ -93,7 +93,7 @@ $(window).load(function() {
         }
 
         var appendItem = '<div class="item-description" style="background-color:' + highlight + '">' + 
-                            '<a href="item/' + item + '" class="link-to-item">' +
+                            '<a href="' + item + '" class="link-to-item">' +
                             '<div class="item-img">' +
                                 '<img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/' + item + '.png"' + 'height="50">' +
                             '</div>' + 

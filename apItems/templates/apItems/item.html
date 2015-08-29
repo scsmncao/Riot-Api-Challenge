@@ -6,13 +6,52 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 		<script src="{% static 'apItems/js/underscore-min.js' %}"></script>
+		<script src="{% static 'apItems/js/item.js' %}"></script>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link rel="stylesheet" href="{% static 'apItems/css/mystyles.css' %}">
 	</head>
 	<body>
 		<div class="nav-bar">
-			<div class="nav-bar-logo">
-				Patch by Patch
+			<a href="index.html" class="nav-home">
+				<div class="nav-bar-logo">
+					Patch by Patch
+				</div>
+			</a>
+		</div>
+		<div class="full-item-description">
+			<div class="item-main-name">
+			</div>
+			<div class="item-image-big">
+				<img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/{{ itemId }}.png" height="120">
+			</div>
+			<div class="item-results">
+				<div class="buy-rate-block info-block">
+					Buy Rate
+					<div class="buy-rate-info main-info">
+					</div>
+				</div>
+				<div class="win-rate-block info-block">
+					Win Rate
+					<div class="win-rate-info main-info">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="champion-lists">
+			<div class="champion-list-title">
+				Popular Champions
+			</div>
+			<div class="champion-individual-list">
+				<div class="champion-list-firstpatch champion-list">
+				<div class="patch-number">
+					5.11
+				</div>
+				</div>
+				<div class="champion-list-secondpatch champion-list">
+				<div class="patch-number">
+					5.14
+				</div>
+				</div>
 			</div>
 		</div>
 	</body>

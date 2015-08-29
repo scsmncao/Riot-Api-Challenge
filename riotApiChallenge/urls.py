@@ -8,5 +8,6 @@ urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'apItems.views.index', name='index'),
-    url(r'^item/(?P<id>[0-9]+)$', 'apItems.views.item', name='item'),
+    url(r'^index', 'apItems.views.index', name='index'),
+    url(r'^(?P<itemId>[0-9]{4})$', 'apItems.views.item', name='item'),
 ]

@@ -6,5 +6,5 @@ from django.views import generic
 def index(request):
     return render(request, 'apItems/index.html')
 
-def item(request, id):
-	return render(request, 'apItems/item.html')
+def item(request, itemId):
+	return render(request, 'apItems/item.html', {'itemId': itemId})
