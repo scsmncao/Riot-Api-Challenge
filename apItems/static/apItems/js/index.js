@@ -30,11 +30,35 @@ function httpGet(theUrl) {
     return xmlHttp.responseText;
 }
 
+function getArrow(firstRate, secondRate) {
+    if (firstRate > secondRate) {
+        arrow = 'https://upload.wikimedia.org/wikipedia/commons/0/04/Red_Arrow_Down.svg';
+    }
+    else if (Math.abs(firstRate - secondRate) < .0000001) {
+        arrow = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Neutral_icon_C.svg/2000px-Neutral_icon_C.svg.png';
+    }
+    else {
+        arrow = 'https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg';
+    }
+    return arrow;
+}
+
+function getColor(firstRate, secondRate) {
+    var rateDifference = secondRate - firstRate;
+    if (rateDifference >= 0 ){
+        var color = '#00FF00';
+    }
+    else {
+        var color = '#FF3300';
+    }
+    return color;
+}
+
 $(window).load(function() {
     $('.inner-container').append('<div class="patches-compared">' +
                                     'Patch ' + patches[0] + ' vs Patch ' + patches[1] +
                                 '</div>'
-                                )
+                                );
     $('.inner-container').append('<div class="labels">' + 
                                 '<div class="name-of-item label-for-chart">' +
                                     'Item Name' +
@@ -51,41 +75,17 @@ $(window).load(function() {
         var buyRateSecond = secondPatchData[item]['buy_rate'] * 100;
         var winRateFirst = firstPatchData[item]['win_rate'] * 100;
         var winRateSecond = secondPatchData[item]['win_rate'] * 100;
-        if (buyRateFirst > buyRateSecond) {
-            arrowBuy = 'https://upload.wikimedia.org/wikipedia/commons/0/04/Red_Arrow_Down.svg';
-        }
-        else if (Math.abs(buyRateFirst - buyRateSecond) < .0000001) {
-            arrowBuy = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Neutral_icon_C.svg/2000px-Neutral_icon_C.svg.png';
-        }
-        else {
-            arrowBuy = 'https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg';
-        }
-        if (winRateFirst > winRateSecond) {
-            arrowWin = 'https://upload.wikimedia.org/wikipedia/commons/0/04/Red_Arrow_Down.svg';
-        }
-        else if (Math.abs(winRateFirst - winRateSecond) < .0000001) {
-            arrowWin = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Neutral_icon_C.svg/2000px-Neutral_icon_C.svg.png';
-        }
-        else {
-            arrowWin = 'https://upload.wikimedia.org/wikipedia/commons/5/50/Green_Arrow_Up.svg';
-        }
 
-        var buyRateDifference = buyRateSecond - buyRateFirst;
-        var winRateDifference = winRateSecond - winRateFirst;
-        if (buyRateDifference >= 0){
-            var colorBuy = '#00FF00';
-        }
-        else {
-            var colorBuy = '#FF3300';
-        }
-        if (winRateDifference >= 0){
-            var colorWin = '#00FF00';
-        }
-        else {
-            var colorWin = '#FF3300';
-        }
+        arrowBuy = getArrow(buyRateFirst, buyRateSecond);
+        arrowWin = getArrow(winRateFirst, winRateSecond);
 
-        if (Math.abs(winRateDifference) > 2) {
+        colorBuy = getColor(buyRateFirst, buyRateSecond);
+        colorWin = getColor(winRateFirst, winRateSecond);
+
+        buyRateDifference = buyRateSecond - buyRateFirst;
+        winRateDifference = winRateSecond - winRateFirst;
+
+        if (Math.abs(winRateSecond - winRateFirst) > 2) {
             var highlight = '#000066';
         }
         else {

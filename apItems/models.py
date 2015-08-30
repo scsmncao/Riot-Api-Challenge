@@ -10,6 +10,9 @@ import operator
 
 requests.packages.urllib3.disable_warnings()
 
+collectData = False
+
+
 with open('apItems/dev_api_key', 'r') as f:
     devApiKey = f.readline()
 
@@ -35,7 +38,7 @@ riotApi = RiotWatcher(devApiKey)
 #       return itemString
 
 # this will take a few days so start it early
-def fetchDatafromApi():
+def fetchDatafromApi(patch, mode, server):
     listOfGamesAndCount = getListOfGamesAndCount()
     numberOfGamesCountByRegion = listOfGamesAndCount[0]
     listOfGames = listOfGamesAndCount[1]
@@ -43,38 +46,35 @@ def fetchDatafromApi():
 
     gamesCount = 0
 
-    for patch in patchesToCompare:
-        for mode in gameModes:
-            for server in servers:
-                filePath = 'apItems/static/apItems/data/' + patch + '/' + mode + '/' + server + '.json'
-                if os.path.isfile(filePath):
-                    continue
-                gameIds = listOfGames[patch][mode][server]
-                # need to split off the data to gather the data from the servers faster (if I store everything at once
-                # it uses up too much memory)
-                currentApItems = copy.deepcopy(dictionaryOfApItems)
-                for game in gameIds:
-                    # riotwatcher has a dev limit so need to try catch to avoid limits
-                    try:
-                        matchData = riotApi.get_match(game, region=server.lower())
-                    except:
-                        pass
-                    for summoner in matchData['participants']:
-                        # get all items for that summoner
-                        for i in range(0,7):
-                            itemId = str(summoner['stats']['item' + str(i)])
-                            if itemId in dictionaryOfApItems:
-                                item = currentApItems[itemId]
-                                item['useCount'] += 1
-                                item['championsUsed'][summoner['championId']] += 1
-                                if summoner['stats']['winner']:
-                                    item['wins'] += 1
-                    gamesCount += 1
-                    print 'on game %i for %s in %s region and on patch %s' % (gamesCount, mode, server, patch)
-                gamesCount = 0
-                with open(filePath, 'w+') as f:
-                    json.dump(currentApItems, f)
-                    f.close()
+    filePath = 'apItems/static/apItems/data/' + patch + '/' + mode + '/' + server + '.json'
+    if os.path.isfile(filePath):
+        return
+    gameIds = listOfGames[patch][mode][server]
+    # need to split off the data to gather the data from the servers faster (if I store everything at once
+    # it uses up too much memory)
+    currentApItems = copy.deepcopy(dictionaryOfApItems)
+    for game in gameIds:
+        # riotwatcher has a dev limit so need to try catch to avoid limits
+        try:
+            matchData = riotApi.get_match(game, region=server.lower())
+        except:
+            pass
+        for summoner in matchData['participants']:
+            # get all items for that summoner
+            for i in range(0,7):
+                itemId = str(summoner['stats']['item' + str(i)])
+                if itemId in dictionaryOfApItems:
+                    item = currentApItems[itemId]
+                    item['useCount'] += 1
+                    item['championsUsed'][summoner['championId']] += 1
+                    if summoner['stats']['winner']:
+                        item['wins'] += 1
+        gamesCount += 1
+        print 'on game %i for %s in %s region and on patch %s' % (gamesCount, mode, server, patch)
+    gamesCount = 0
+    with open(filePath, 'w+') as f:
+        json.dump(currentApItems, f)
+        f.close()
 
 def gatherAllApItems():
     allItems = riotApi.static_get_item_list(region="na", item_list_data='tags')
@@ -177,12 +177,21 @@ def createFinalDataSet(patch, mode, server):
             win_rate = dataFile[item]['wins']/float(dataFile[item]['useCount'])
         else:
             win_rate = 0
+        itemData = riotApi.static_get_item(item, item_data='all');
+        fromItems = {};
+        intoItems = {};
+        if 'from' in itemData:
+            fromItems = itemData['from'];
+        if 'into' in itemData:
+            intoItems = itemData['into'];
         finalData[item] = {
             # the 100000 is from 10000 games with 10 people in them so 10000 * 10
             'buy_rate': dataFile[item]['useCount']/100000.0,
             'win_rate': win_rate,
             'champions': finalTopChampionDict,
-            'name': riotApi.static_get_item(item)['name']
+            'name': itemData['name'],
+            'from': fromItems,
+            'intoItems': intoItems
         }
     with open(finalPath, 'w+') as f:
         json.dump(finalData, f)
@@ -195,6 +204,8 @@ def createCombinedDataSet():
         for mode in gameModes:
             for server in servers:
                 filePath = 'apItems/static/apItems/final_data/' + patch + '/' + mode + '/' + server + '.json'
+                # if os.path.isfile(finalPath):
+                #     return
                 dataFile = convertJsonToObject(filePath)
                 for item in dataFile.keys():
                     if item not in finalCombinedData and dataFile[item]['buy_rate'] != 0:
@@ -203,6 +214,8 @@ def createCombinedDataSet():
                             'win_rate': 0,
                             'name': dataFile[item]['name'],
                             'champions': {},
+                            'from': dataFile[item]['from'],
+                            'into': dataFile[item]['intoItems']
                         }
                     if dataFile[item]['buy_rate'] != 0:
                         finalCombinedData[item]['buy_rate'] += dataFile[item]['buy_rate']
@@ -231,9 +244,14 @@ def createFinalizedDataSet():
     for patch in patchesToCompare:
         for mode in gameModes:
             for server in servers:
+                print 'fetching data'
+                fetchDatafromApi(patch, mode, server)
+                print 'normalizing'
                 normalizeDataByAddingItemTree(patch, mode, server)
+                print 'creating final data set'
                 createFinalDataSet(patch, mode, server)
 
-fetchDatafromApi()
-createFinalizedDataSet()
-createCombinedDataSet()
+if collectData:
+    createFinalizedDataSet()
+    print 'combining data'
+    createCombinedDataSet()
