@@ -17,7 +17,11 @@ After that it was just a matter of combining all the regions and getting the per
 
 # What I used
 Django
+
 Python
+
 Javascript/JQuery
+
 HTML/CSS
+
 Heroku
