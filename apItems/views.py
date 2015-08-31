@@ -8,3 +8,6 @@ def index(request):
 
 def item(request, itemId):
 	return render(request, 'apItems/item.html', {'itemId': itemId})
+
+def about(request):
+	return render(request, 'apItems/about.html')

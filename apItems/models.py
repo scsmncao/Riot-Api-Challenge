@@ -204,8 +204,8 @@ def createCombinedDataSet():
         for mode in gameModes:
             for server in servers:
                 filePath = 'apItems/static/apItems/final_data/' + patch + '/' + mode + '/' + server + '.json'
-                # if os.path.isfile(finalPath):
-                #     return
+                if os.path.isfile(finalPath):
+                    return
                 dataFile = convertJsonToObject(filePath)
                 for item in dataFile.keys():
                     if item not in finalCombinedData and dataFile[item]['buy_rate'] != 0:
@@ -240,6 +240,18 @@ def createCombinedDataSet():
             json.dump(finalCombinedData, f)
             f.close()
 
+def createAlphabeticalOrdering():
+    dataFile = convertJsonToObject('apItems/static/apItems/final_data/5.11/combined_data.json')
+    itemNames = {}
+    for item in dataFile.keys():
+        itemNames[item] = riotApi.static_get_item(item)['name'].lower()
+    itemNamesSorted = sorted(itemNames.items(), key=operator.itemgetter(1))
+    itemNamesSorted = [item[0] for item in itemNamesSorted]
+    with open('apItems/static/apItems/final_data/alphabetical_ordering_of_items.json', 'w+') as f:
+        json.dump(itemNamesSorted, f)
+        f.close()
+
+
 def createFinalizedDataSet():
     for patch in patchesToCompare:
         for mode in gameModes:
@@ -255,3 +267,5 @@ if collectData:
     createFinalizedDataSet()
     print 'combining data'
     createCombinedDataSet()
+    print 'creating alphabetical ordering'
+    createAlphabeticalOrdering()

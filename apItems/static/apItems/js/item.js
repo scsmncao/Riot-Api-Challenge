@@ -79,9 +79,13 @@ function appendRates(elementToAppendTo, firstRate, secondRate) {
 }
 
 function appendTreeItems(elementToAppendTo, itemList, type) {
+    console.log(itemList);
     _.each(itemList, function(item) {
         if (firstPatchData.hasOwnProperty(item)) {
             $(elementToAppendTo).append('<a class="build-items" href="/' + item + '">' + '<img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/' + item +'.png" height=30></a>');
+        }
+        else {
+            $(elementToAppendTo).append('<img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/' + item +'.png" height=30>');
         }
     });
     if (itemList.length === undefined) {

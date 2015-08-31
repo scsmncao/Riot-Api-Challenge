@@ -1,5 +1,5 @@
 body { 
-  background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(../images/background.jpg) no-repeat center center fixed; 
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(../images/background.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -28,6 +28,22 @@ body {
     margin-top: 16px;
     margin-left: 35px;
     font-size: 13pt;
+    display:inline-block;
+}
+
+.about {
+    margin-left: 35px;
+    font-size: 11pt;
+    display:inline-block;
+}
+
+.about:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-home {
+    display:inline-block;
 }
 
 .nav-home:hover {
@@ -44,7 +60,7 @@ body {
 
 .list-view {
     width: 1025px;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0,0,0,0.5);
     border-radius: 10px;
     margin: 85px auto 35px auto;
 }
@@ -72,7 +88,7 @@ body {
 }
 
 div.item-description:nth-child(even) {
-    background-color: rgba(20, 20, 20, .7) !important;
+    background-color: rgba(20, 20, 20, .7);
 }
 
 .item-description:last-child {
@@ -149,10 +165,11 @@ div.item-description:hover {
 }
 
 .item-tree-img {
-    padding-top: 5px;
-    background-color: rgba(0,0,0,.7);
+    padding-top: 15px;
+    background-color: rgba(0,0,0,.5);
     padding: 10px 10px 10px 10px;
     border-radius: 5px;
+    margin-top: 5px;
 }
 
 .from-items {
@@ -187,9 +204,20 @@ div.item-description:hover {
 }
 
 .patches-compared {
-    text-align: center;
+    text-align: right;
     color: white;
-    font-size: 16pt;
+    font-size: 11pt;
+    float: right;
+    margin-top: 20px;
+    margin-right: 35px;
+}
+
+.patches-compared a {
+    display: inline-block;
+}
+
+.patches-compared a:hover {
+    color:white;
 }
 
 .full-item-description {
@@ -239,7 +267,7 @@ div.item-description:hover {
 }
 
 .main-info {
-    background-color: rgba(0,0,0,.7);
+    background-color: rgba(0,0,0,.5);
     border-radius: 5px;
     padding: 15px 15px 15px 15px;
 }
@@ -263,7 +291,7 @@ div.item-description:hover {
 .champion-list {
     display:inline-block;
     width: 370px;
-    background-color: rgba(0,0,0,.7);
+    background-color: rgba(0,0,0,.5);
     border-radius: 5px;
     padding: 10px 10px 10px 10px;
 }
@@ -275,6 +303,18 @@ div.item-description:hover {
 .champion-individual-list {
     width: 800px;
     margin: 0 auto;
+}
+
+.about-body {
+    width: 95%;
+    margin: 100px auto;
+    color: #FFFFFF;
+    font-size: 13pt;
+}
+
+.about-title {
+    font-size: 18pt;
+    margin-bottom: 30px;
 }
 
 @media screen and (max-width: 1025px) {

@@ -4,6 +4,7 @@ var modes = ['NORMAL_5X5', 'RANKED_SOLO']
 
 var firstPatchData = {}
 var secondPatchData = {}
+var orderOfItems = []
 
 $.ajax({
   url: "static/apItems/final_data/5.11/combined_data.json",
@@ -20,6 +21,15 @@ $.ajax({
   async: false,
   success: function(data) {
     secondPatchData = data;
+  }
+});
+
+$.ajax({
+  url: "static/apItems/final_data/alphabetical_ordering_of_items.json",
+  dataType: 'json',
+  async: false,
+  success: function(data) {
+    orderOfItems = data;
   }
 });
 
@@ -55,10 +65,6 @@ function getColor(firstRate, secondRate) {
 }
 
 $(window).load(function() {
-    $('.inner-container').append('<div class="patches-compared">' +
-                                    'Patch ' + patches[0] + ' vs Patch ' + patches[1] +
-                                '</div>'
-                                );
     $('.inner-container').append('<div class="labels">' + 
                                 '<div class="name-of-item label-for-chart">' +
                                     'Item Name' +
@@ -70,7 +76,7 @@ $(window).load(function() {
                                     'Win Rate' +
                                 '</div>' +
                             '</div>');
-    _.each(Object.keys(firstPatchData), function(item) {
+    _.each(orderOfItems, function(item) {
         var buyRateFirst = firstPatchData[item]['buy_rate'] * 100;
         var buyRateSecond = secondPatchData[item]['buy_rate'] * 100;
         var winRateFirst = firstPatchData[item]['win_rate'] * 100;
@@ -86,13 +92,13 @@ $(window).load(function() {
         winRateDifference = winRateSecond - winRateFirst;
 
         if (Math.abs(winRateSecond - winRateFirst) > 2) {
-            var highlight = '#000066';
+            var highlight = '<div class="item-description" style="background-color:#000066">';
         }
         else {
-            var highlight = 'transparent';
+            var highlight = '<div class="item-description">';
         }
 
-        var appendItem = '<div class="item-description" style="background-color:' + highlight + '">' + 
+        var appendItem =  highlight +
                             '<a href="' + item + '" class="link-to-item">' +
                             '<div class="item-img">' +
                                 '<img src="http://ddragon.leagueoflegends.com/cdn/5.16.1/img/item/' + item + '.png"' + 'height="50">' +
