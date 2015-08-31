@@ -1,7 +1,7 @@
 # Riot Games API Challenge 2.0
 
 # Deployment
-This website is deploy at http://patchbypatch.herokuapp.com
+This website is deployed at http://patchbypatch.herokuapp.com (may take awhile to load)
 
 # Data
 The data isn't publicly available.
