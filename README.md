@@ -16,12 +16,8 @@ However, all that told me was the items that the summoner ended the match with. 
 After that it was just a matter of combining all the regions and getting the percentages. For the buy rate I took the the number of times it was bought and divided it by 10000 (games) * 10 (people in each game). This would give me the ratio of times it was bought per summoner (note that an item can be bought more than once by the same summoner which explains the reason why Amplifying Tome's buy rate is over 100%). The win rate is found by dividing the number of wins by the number of times it was bought. The most popular champions was found based on the number of times each champion bought the item. 
 
 # What I used
-Django
-
-Python
-
-Javascript/JQuery
-
-HTML/CSS
-
-Heroku
+* Django
+* Python
+* Javascript/JQuery
+* HTML/CSS
+* Heroku
